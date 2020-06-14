@@ -125,13 +125,21 @@
           weightEntries.forEach(([key, value]) => {
             sectorPointsTotal += value.points;
           });
+          console.warn("sectorPointsTotal is: ", sectorPointsTotal);
           weightEntries.forEach(([key, value]) => {
             const sectorTotal = (value.points / sectorPointsTotal) * spendTotal;
             perSectorTotals[key] = sectorTotal;
             const stockEntries = Object.entries(value.stocks);
-            const stockPointsTotal = stockEntries.reduce((accumulator, currentValue) => accumulator + currentValue[1]);
+            let stockPointsTotal = 0;
+            stockEntries.forEach(([key, value]) => {
+              stockPointsTotal += value;
+            });
+
+            console.warn("stockPointsTotal is: ", stockPointsTotal);
+            console.warn("sectorTotal is: ", sectorTotal);
             stockEntries.forEach(([stockKey, points]) => {
-              distribution[key] = (points / stockPointsTotal) * sectorTotal;
+              console.warn((points / stockPointsTotal) * sectorTotal);
+              distribution[stockKey] = (points / stockPointsTotal) * sectorTotal;
             })
           });
           
@@ -158,7 +166,6 @@
             <div className="row justify-content-around bg-dark">
               <h2 className="col-12 p-2 text-center text-white">Totals Per-Sector</h2>
               {Object.entries(state.perSectorTotals).map(([key, value]) => {
-                console.warn(key, value);
                 return (
                   <div class={`${key === 'CRYPTO' ? 'bg-warning' : ''} card mx-4 mb-3`}>
                     <div class="card-body">
@@ -172,12 +179,11 @@
             <div className="row justify-content-around">
               <h2 className="col-12 p-2 text-center">Individual buys</h2>
               {Object.entries(state.distribution).map(([key, value]) => {
-                console.warn(key, value);
                 return (
                   <div className="col-auto p-3">
-                    <button type="button" className="btn btn-primary">
+                    <button type="button" className={`${key === 'CRYPTO' ? 'btn-warning' : 'btn-primary'} btn`}>
                       {`${key} `}
-                      <span className="badge badge-light">${value.toFixed(2)}</span>
+                      <span className={`${key === 'CRYPTO' ? 'badge-success' : 'badge-light'} badge`}>${value.toFixed(2)}</span>
                     </button>
                   </div>
                 )
