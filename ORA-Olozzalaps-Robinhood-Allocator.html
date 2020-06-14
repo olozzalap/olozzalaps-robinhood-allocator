@@ -8,18 +8,19 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
     <style>
-      #Wrap {
+      body {
+        min-height: 100vh;
         background: linear-gradient(179deg, rgba(248,249,250,0.97) 0%, rgba(123,203,91,0.84) 77%, rgba(7,231,255,1) 100%);
       }
     </style>
   </head>
   <body>
-    <main class="container py-2" id="Wrap">
+    <main class="container pt-5 pb-3" id="Wrap">
       <div id="App"></div>
     </main>
 
     <script type="text/babel">
-      const { useState } = React;
+      const { useState, useEffect } = React;
 
       const weights = {
         US: {
@@ -119,7 +120,7 @@
           const weightEntries = Object.entries(weights);
           let sectorPointsTotal = 0;
           const perSectorTotals = {};
-          const distribution: {};
+          const distribution = {};
           
           weightEntries.forEach(([key, value]) => {
             sectorPointsTotal += value.points;
@@ -142,30 +143,34 @@
             perSectorTotals
           })
         }
+
+        useEffect(() => {
+          handleChange({target: {value: 1000}});
+        }, [])
         
         console.warn(Object.entries(state.distribution));
         
         return (
           <div>
-            <div className="row justify-content-center">
+            <div className="row justify-content-center mb-3">
               <input type="number" placeholder="Invest how much?" className="col-4 bg-light text-primary p-3" onChange={handleChange} value={state.amtToInvest}/>
             </div>
-            <div className="row justify-content-around bg-dark text-white">
-              <h1 className="col-12 p-2">Totals Per-Sector</h1>
+            <div className="row justify-content-around bg-dark">
+              <h2 className="col-12 p-2 text-center text-white">Totals Per-Sector</h2>
               {Object.entries(state.perSectorTotals).map(([key, value]) => {
                 console.warn(key, value);
                 return (
-                  <div class="card">
+                  <div class={`${key === 'CRYPTO' ? 'bg-warning' : ''} card mx-4 mb-3`}>
                     <div class="card-body">
-                      <h4 class="card-title">{key}</h4>
-                      <h5 class="card-subtitle mb-2 text-muted">${value.toFixed(2)}</h5>
+                      <h4 class={`card-title`}>{key}</h4>
+                      <h5 class={`${key === 'CRYPTO' ? 'text-success' : 'text-muted'} card-subtitle mb-2`}>${value.toFixed(2)} ({((value / state.amtToInvest) * 100).toFixed(2)}%)</h5>
                     </div>
                   </div>
                 )
               })}
             </div>
             <div className="row justify-content-around">
-              <h1 className="col-12 p-2">Individual buys</h1>
+              <h2 className="col-12 p-2 text-center">Individual buys</h2>
               {Object.entries(state.distribution).map(([key, value]) => {
                 console.warn(key, value);
                 return (
