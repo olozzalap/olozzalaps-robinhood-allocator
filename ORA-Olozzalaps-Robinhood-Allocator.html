@@ -15,7 +15,7 @@
     </style>
   </head>
   <body>
-    <main class="container pt-5 pb-3" id="Wrap">
+    <main class="container py-5 mb-5" id="Wrap">
       <div id="App"></div>
     </main>
 
@@ -154,7 +154,22 @@
 
         useEffect(() => {
           handleChange({target: {value: 1000}});
-        }, [])
+        }, []);
+
+        const isCryptoStock = (key) => {
+          if (Object.keys(weights?.CRYPTO?.stocks).indexOf(key) > -1) {
+            return true;
+          }
+          return false;
+        }
+        const parseDollarsOrSharesToBuy = (key, value) => {
+          const matchingSharePrice = stocksWholeShareOnly[key];
+          if (matchingSharePrice) {
+            console.warn(key, value, matchingSharePrice);
+            return `${Math.round(value / matchingSharePrice)} shares`
+          }
+          return `$${value.toFixed(2)}`
+        }
         
         console.warn(Object.entries(state.distribution));
         
@@ -176,14 +191,16 @@
                 )
               })}
             </div>
-            <div className="row justify-content-around">
+            <div className="row justify-content-around pt-3">
               <h2 className="col-12 p-2 text-center">Individual buys</h2>
               {Object.entries(state.distribution).map(([key, value]) => {
                 return (
                   <div className="col-auto p-3">
-                    <button type="button" className={`${key === 'CRYPTO' ? 'btn-warning' : 'btn-primary'} btn`}>
+                    <button type="button" className={`${isCryptoStock(key) ? 'btn-warning' : 'btn-primary'} btn`}>
                       {`${key} `}
-                      <span className={`${key === 'CRYPTO' ? 'badge-success' : 'badge-light'} badge`}>${value.toFixed(2)}</span>
+                      <span className={`${isCryptoStock(key) ? 'badge-success' : 'badge-light'} badge`}>
+                        {parseDollarsOrSharesToBuy(key, value)}
+                      </span>
                     </button>
                   </div>
                 )
