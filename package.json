@@ -1,0 +1,7 @@
+{
+  "name": "olozzalaps-robinhood-allocator",
+  "version": "0.0.1",
+  "description": "Simple tool to help my personal distribution of cash into Robinhood investments using custom weights. Using React & Boostrap.",
+  "main": "index.html",
+  "author": "Olozzalap"
+}

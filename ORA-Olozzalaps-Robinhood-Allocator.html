@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ORA</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+      #Wrap {
+        background: linear-gradient(179deg, rgba(248,249,250,0.97) 0%, rgba(123,203,91,0.84) 77%, rgba(7,231,255,1) 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container py-2" id="Wrap">
+      <div id="App"></div>
+    </main>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      const weights = {
+        US: {
+          points: 35.25,
+          stocks: {
+            QQQ:  2.38,
+            VGT:  1.55,
+            BOTZ: 1.80,
+            XT:   1.77,
+            FINX: 1.56,
+            SPY:  1.42,
+            SCHB: 1.17,
+            AIEQ: 1.02
+          }
+        },
+        FOREIGN: {
+          points: 22.60,
+          stocks: {
+            VEA:  1.00,
+            AIIQ: 0.74,
+            LIT:  0.51
+          }
+        },
+        EMERGING: {
+          points: 17.90,
+          stocks: {
+            EEM:  30.00,
+            SPEM: 26.50,
+            VWO:  21.10,
+            KEMQ: 19.30
+          }
+        },
+        DIVIDEND: {
+          points: 10,
+          stocks: {
+            VIG:  1.10,
+            DGRO: 0.80
+          }
+        },
+        SAFE: {
+          points: 4.00,
+          stocks: {
+            SWAN: 1.37,
+            VTEB: 1.21,
+            IAU:  0.84,
+            EMB:  0.64
+          }
+        },
+        FOLDINGMONEY: {
+          points: 4.68,
+          stocks: {
+            TSLA:  2.60,
+            AMD:   1.80,
+            MSFT:  1.50,
+            AMZN:  1.40,
+            NTDOY: 1.32,
+            ATVI:  1.20,
+            NVDA:  1.07,
+            UBER:  0.70
+          }
+        },
+        CRYPTO: {
+          points: 13.65,
+          stocks: {
+            BTC:  36.00,
+            ETH:  24.88,
+            DOGE: 14.20,
+            BSV:  11.40,
+            BCH:   7.00,
+            ETC:   3.70,
+            LTC:   2.80
+          }
+        },
+      };
+      const stocksWholeShareOnly = {
+        AIIQ: 25.20,
+        KEMQ: 25.07
+      }
+        
+      const pctToInt = (pct) => {
+        return parseFloat(pct / 100) || 0;
+      }
+
+      const App = (props) => {
+        const [state, setState] = useState({
+          amtToInvest: null,
+          distribution: {},
+          perSectorTotals: {}
+        });
+        
+        const handleChange = (e) => {
+          const spendTotal = e.target.value;
+          console.warn(spendTotal);
+          if (isNaN(spendTotal)) {
+            return;
+          }
+          const weightEntries = Object.entries(weights);
+          let sectorPointsTotal = 0;
+          const perSectorTotals = {};
+          const distribution: {};
+          
+          weightEntries.forEach(([key, value]) => {
+            sectorPointsTotal += value.points;
+          });
+          weightEntries.forEach(([key, value]) => {
+            const sectorTotal = (value.points / sectorPointsTotal) * spendTotal;
+            perSectorTotals[key] = sectorTotal;
+            const stockEntries = Object.entries(value.stocks);
+            const stockPointsTotal = stockEntries.reduce((accumulator, currentValue) => accumulator + currentValue[1]);
+            stockEntries.forEach(([stockKey, points]) => {
+              distribution[key] = (points / stockPointsTotal) * sectorTotal;
+            })
+          });
+          
+          console.warn(spendTotal, distribution, perSectorTotals);
+          
+          setState({
+            amtToInvest: spendTotal,
+            distribution,
+            perSectorTotals
+          })
+        }
+        
+        console.warn(Object.entries(state.distribution));
+        
+        return (
+          <div>
+            <div className="row justify-content-center">
+              <input type="number" placeholder="Invest how much?" className="col-4 bg-light text-primary p-3" onChange={handleChange} value={state.amtToInvest}/>
+            </div>
+            <div className="row justify-content-around bg-dark text-white">
+              <h1 className="col-12 p-2">Totals Per-Sector</h1>
+              {Object.entries(state.perSectorTotals).map(([key, value]) => {
+                console.warn(key, value);
+                return (
+                  <div class="card">
+                    <div class="card-body">
+                      <h4 class="card-title">{key}</h4>
+                      <h5 class="card-subtitle mb-2 text-muted">${value.toFixed(2)}</h5>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div className="row justify-content-around">
+              <h1 className="col-12 p-2">Individual buys</h1>
+              {Object.entries(state.distribution).map(([key, value]) => {
+                console.warn(key, value);
+                return (
+                  <div className="col-auto p-3">
+                    <button type="button" className="btn btn-primary">
+                      {`${key} `}
+                      <span className="badge badge-light">${value.toFixed(2)}</span>
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )
+      }
+
+      ReactDOM.render(<App />, document.querySelector("#App"));
+
+    </script>
+  </body>
+</html>
