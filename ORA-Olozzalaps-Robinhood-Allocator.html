@@ -196,12 +196,14 @@
               {Object.entries(state.distribution).map(([key, value]) => {
                 return (
                   <div className="col-auto p-3">
-                    <button type="button" className={`${isCryptoStock(key) ? 'btn-warning' : 'btn-primary'} btn`}>
-                      {`${key} `}
-                      <span className={`${isCryptoStock(key) ? 'badge-success' : 'badge-light'} badge`}>
-                        {parseDollarsOrSharesToBuy(key, value)}
-                      </span>
-                    </button>
+                    <a href={`https://robinhood.com/${isCryptoStock(key) ? 'crypto' : 'stocks'}/${key}`} target="_blank">
+                      <button type="button" className={`${isCryptoStock(key) ? 'btn-warning' : 'btn-primary'} btn`}>
+                        {`${key} `}
+                        <span className={`${isCryptoStock(key) ? 'badge-success' : 'badge-light'} badge`}>
+                          {parseDollarsOrSharesToBuy(key, value)}
+                        </span>
+                      </button>
+                    </a>
                   </div>
                 )
               })}
